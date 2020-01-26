@@ -1,0 +1,41 @@
+//import 'package:flutter/material.dart';
+//import 'package:rasseed/screens/Login_with_flip.dart';
+//import 'package:rasseed/utils/router_animation.dart';
+//import 'package:rasseed/screens/AccountStatment.dart';
+//import 'package:rasseed/screens/BankTransfer.dart';
+//import 'package:rasseed/screens/DataEdit.dart';
+//import 'package:rasseed/screens/DepositBalance.dart';
+//import 'package:rasseed/screens/EditPaymentMethod.dart';
+//import 'package:rasseed/screens/Home_screen.dart';
+//import 'package:rasseed/screens/invite_friends.dart';
+//import 'package:rasseed/screens/login.dart';
+//import 'package:rasseed/screens/Login_with_flip.dart';
+//import 'package:rasseed/screens/PaymentMethod.dart';
+//import 'package:rasseed/screens/PaymentMethodData.dart';
+//import 'package:rasseed/screens/Profile.dart';
+//import 'package:rasseed/screens/Setting.dart';
+//import 'package:rasseed/screens/sign_up.dart';
+//import 'package:rasseed/screens/verfiy_login.dart';
+//import 'package:rasseed/screens/all_pages.dart';
+//
+//void main() {
+//  runApp(MaterialApp(
+//    title: 'Rasseed',
+//    home: Home_screen(),
+//    onGenerateRoute: (settings) {
+//      switch (settings.name) {
+//        case '/signup':
+//          return ScaleRotateRoute(page: PaymentMethodData());
+//          break;
+//        case '/login':
+//          return ScaleRotateRoute(page: PaymentMethod());
+//          break;
+//        default:
+//          {
+//            return (page: ());
+//          }
+//          break;
+//      }
+//    },
+//  ));
+//}
