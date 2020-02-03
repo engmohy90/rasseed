@@ -168,18 +168,62 @@ class _ArchiveOperationsState extends State<ArchiveOperations> {
                       ),
                     ),
                   ),
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    child: Text(
-                      '${itemsList[index]['value']}'
-                      "رس",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w300,
-                        fontSize: 15,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Container(
+                        alignment: Alignment.bottomCenter,
+                        child: Row(
+                          children: <Widget>[
+                            Text(
+                              "رس",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w300,
+                                fontSize: 15,
+                              ),
+                            ),
+                            SizedBox(width: 2,),
+                            Text(
+                              '${itemsList[index]['value']}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w300,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                      Container(
+                        alignment: Alignment.bottomCenter,
+                        child: Row(
+                          children: <Widget>[
+                            Text(
+                              'بطاقه',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w300,
+                                fontSize: 15,
+                              ),
+                            ),
+                            SizedBox(width: 2,),
+                            Text(
+                              '${itemsList[index]["quantity"]}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w300,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

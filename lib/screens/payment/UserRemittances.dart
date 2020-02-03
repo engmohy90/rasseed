@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:rasseed/utils/center_loader.dart';
 import 'package:rasseed/utils/loader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -72,9 +73,9 @@ class _UserRemittancesState extends State<UserRemittances> {
                   remittancesModelList.add(RemittancesModel.fromJson(item));
                 });
               })
-            : userRemittanceScaffoldKey.currentState.showSnackBar(
-                SnackBar(                          backgroundColor: Colors.red,
-                    content: Text('حدث خطأ فى الاتصال بالانترنت!')));
+            : userRemittanceScaffoldKey.currentState.showSnackBar(SnackBar(
+                backgroundColor: Colors.red,
+                content: Text('حدث خطأ فى الاتصال بالانترنت!')));
       });
     });
   }
@@ -134,70 +135,92 @@ class _UserRemittancesState extends State<UserRemittances> {
                 ],
               ),
             ),
-            ListView.builder(
-              primary: false,
-              shrinkWrap: true,
-              itemCount: 8,
-              itemBuilder: (BuildContext context, int index) {
-                return Column(
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(top: 15.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                              margin: EdgeInsets.only(left: 20.0, top: 7.0),
-                              child: Text(
-                                "-100",
-                                style: TextStyle(
-                                    fontSize: 15.0,
-                                    color: Colors.red.withOpacity(1.0),
-                                    fontWeight: FontWeight.w400),
-                              )),
-                          Container(
-                            margin: EdgeInsets.only(right: 20.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                Container(
-                                  child: Text(
-                                    "شراء بطاقة موبايلى من رصيدي",
-                                    style: TextStyle(
-                                        color: Color.fromRGBO(69, 57, 137, 1.0),
-                                        fontSize: 15),
-                                  ),
+            remittancesModelList != null
+                ? remittancesModelList.length > 0
+                    ? ListView.builder(
+                        primary: false,
+                        shrinkWrap: true,
+                        itemCount: remittancesModelList != null
+                            ? remittancesModelList.length : 0,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: <Widget>[
+                              Container(
+                                margin: EdgeInsets.only(top: 15.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      margin:
+                                          EdgeInsets.only(left: 20.0, top: 7.0),
+                                      child: Text(
+                                        '${remittancesModelList[index].amount??''}',
+                                        style: TextStyle(
+                                          fontSize: 15.0,
+                                          color: Colors.red.withOpacity(1.0),
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(right: 20.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          Container(
+                                            child: Text(
+                                              '${remittancesModelList[index].user??''}',
+                                              style: TextStyle(
+                                                color: Color.fromRGBO(69, 57, 137, 1.0),
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            child: Text(
+                                              '${remittancesModelList[index].creation??''}',
+                                              style: TextStyle(
+                                                  color: Color.fromRGBO(
+                                                      69, 57, 137, 1.0),
+                                                  fontSize: 12),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    // todo the
+                                    Container(
+                                      margin: EdgeInsets.only(right: 20.0),
+                                      child: Icon(Icons.refresh),
+                                    ),
+                                  ],
                                 ),
-                                Container(
-                                  child: Text(
-                                    "التاريخ 13-08-2019",
-                                    style: TextStyle(
-                                        color: Color.fromRGBO(69, 57, 137, 1.0),
-                                        fontSize: 12),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(right: 20.0),
-                            child: Icon(Icons.refresh),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10.0),
-                      width: MediaQuery.of(context).size.width,
-                      height: .5,
-                      color: Colors.grey.withOpacity(.5),
-                    ),
-                  ],
-                );
-              },
-            )
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(top: 10.0),
+                                width: MediaQuery.of(context).size.width,
+                                height: .5,
+                                color: Colors.grey.withOpacity(.5),
+                              ),
+                            ],
+                          );
+                        },
+                      )
+                    : Container(
+                        height: MediaQuery.of(context).size.height / 1.5,
+                        child: Container(
+                          alignment: Alignment.center,
+                          child: Text("لا يوجد بيانات لعرضها"),
+                        ),
+                      )
+                : Container(
+                    child: Center(child: CenterCircularLoader()),
+                  ),
           ],
         ),
       ),

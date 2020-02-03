@@ -82,7 +82,7 @@ class _pervious_cardsState extends State<pervious_cards> {
     if (response.statusCode == 200) {
       Loader.hideDialog(context);
       print('\n\nbody is: ${json.decode(replay)['message']}\n\n');
-      json.decode(replay)['message'].forEach((cardData) {
+      if(json.decode(replay)['message']!= null)json.decode(replay)['message'].forEach((cardData) {
         setState(() => cardsDataList.add(cardData));
       });
     } else {

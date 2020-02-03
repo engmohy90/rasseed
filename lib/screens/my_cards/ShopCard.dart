@@ -6,9 +6,9 @@ import 'dart:ui' as prefix0;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:rasseed/screens/my_cards/SendCard.dart';
 import 'package:rasseed/screens/my_cards/TransferCard.dart';
 import 'package:rasseed/screens/my_cards/my_cards.dart';
-import 'package:rasseed/screens/my_cards/SendCard.dart';
 import 'package:rasseed/screens/settings/Profile.dart';
 import 'package:rasseed/utils/custom_circle_avatar.dart';
 import 'package:rasseed/utils/loader.dart';
@@ -82,28 +82,31 @@ class ShopCard extends StatefulWidget {
 class _ShopCardState extends State<ShopCard> {
   bool isExpanded = false;
   bool isSending = false;
-  int cardsNumber;
+  int scrappingCardsNumber;
+  int returningCardsNumber;
 
   Map<String, dynamic> card;
 
   GlobalKey<ScaffoldState> shopCartGlobalKey = GlobalKey();
-  TextEditingController cardsNumberController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
+  bool displayError = false;
+
   scrappingAlert(StateSetter setter) {
-    setState(() {
-      cardsNumber = 1;
-      cardsNumberController.text = cardsNumber.toString();
+    setter(() {
+      scrappingCardsNumber = 1;
+      displayError = false;
     });
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (BuildContext context, StateSetter state) => AlertDialog(
+      builder: (context) =>
+          StatefulBuilder(builder: (BuildContext context, StateSetter state) {
+        return AlertDialog(
           elevation: 4.0,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10.0))),
           content: Container(
-            height: MediaQuery.of(context).size.height / 4,
+            height: displayError ? MediaQuery.of(context).size.height / 3 : MediaQuery.of(context).size.height / 4,
             width: MediaQuery.of(context).size.width,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -126,10 +129,15 @@ class _ShopCardState extends State<ShopCard> {
                         children: <Widget>[
                           GestureDetector(
                             onTap: () {
-                              cardsNumber = cardsNumber + 1;
-                              print('\n\n;lkjhgfcghjkl; $cardsNumber\n\n');
-                              cardsNumberController.text =
-                                  cardsNumber.toString();
+                              if (scrappingCardsNumber < card['mycredits'])
+                                state(() {
+                                  scrappingCardsNumber = scrappingCardsNumber + 1;
+                                  print('\n\n;lkjhgfcghjkl; $scrappingCardsNumber\n\n');
+                                });
+                              else
+                                state(() {
+                                  displayError = true;
+                                });
                             },
                             child: Container(
                               width: 40,
@@ -146,36 +154,23 @@ class _ShopCardState extends State<ShopCard> {
                             ),
                           ),
                           Container(
-                              padding: EdgeInsets.only(left: 15, right: 15),
-                              width: (MediaQuery.of(context).size.width / 100) *
-                                  20,
-//                            Text(cardsNumber.toString(),),// todo does not updated ??!!!!!!!
-                              child: TextField(
-                                controller: cardsNumberController,
-                                autofocus: false,
-                                textAlign: TextAlign.center,
-                                focusNode: FocusNode(),
-                                style: TextStyle(fontSize: 14),
-                                maxLines: 1,
-                                keyboardType: TextInputType.phone,
-                                decoration: InputDecoration(
-                                  hintText: cardsNumber.toString(),
-                                  border: InputBorder.none,
-                                ),
-                                onChanged: (number) {
-                                  cardsNumber = int.parse(number);
-                                },
-                              )),
+                            padding: EdgeInsets.only(left: 15, right: 15),
+                            child: Text(
+                              scrappingCardsNumber.toString(),
+                            ),
+                          ),
                           GestureDetector(
                             onTap: () {
-                              if (cardsNumber > 1) {
-                                setState(() {
-                                  cardsNumber = cardsNumber - 1;
-                                  cardsNumberController.text =
-                                      cardsNumber.toString();
-                                  print('\n\n;lkjhgfcghjkl; $cardsNumber\n\n');
+                              if (scrappingCardsNumber > 1) {
+                                state(() {
+                                  displayError = false;
+                                  scrappingCardsNumber = scrappingCardsNumber - 1;
+                                  print('\n\n;lkjhgfcghjkl; $scrappingCardsNumber\n\n');
                                 });
-                              }
+                              } else
+                                state(() {
+                                  displayError = false;
+                                });
                             },
                             child: Container(
                               width: 40,
@@ -196,6 +191,15 @@ class _ShopCardState extends State<ShopCard> {
                         ],
                       ),
                     )),
+
+                // ignore: sdk_version_ui_as_code
+                if (displayError)
+                  Container(
+                    child: Text(
+                      'غير مسموح بكشط عدد اكبر من عدد بطاقاتك',
+                    ),
+                  ),
+
                 Container(
                   margin: EdgeInsets.only(top: 15),
                   child: Row(
@@ -212,7 +216,7 @@ class _ShopCardState extends State<ShopCard> {
                                   (savedPhone) => scrapCard(
                                               savedSID,
                                               card['namecard'],
-                                              cardsNumber,
+                                              scrappingCardsNumber,
                                               savedPhone)
                                           .then((scrapCardStatus) {
                                         if (scrapCardStatus) {
@@ -224,12 +228,12 @@ class _ShopCardState extends State<ShopCard> {
                                             ),
                                           ));
                                           Timer(
-                                              Duration(seconds: 1),
+                                              Duration(milliseconds: 500),
                                               () => Navigator.pushReplacement(
                                                   context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
-                                                          Profile())));
+                                                          My_cards())));
                                         } else {
                                           Navigator.pop(context);
 
@@ -272,116 +276,319 @@ class _ShopCardState extends State<ShopCard> {
               ],
             ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
-
-  sendingAlert(StateSetter setter) {
+  returningAlert(StateSetter setter) {
+    setter(() {
+      returningCardsNumber = 1;
+      displayError = false;
+    });
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (BuildContext context, StateSetter state) => AlertDialog(
+      builder: (context) =>
+          StatefulBuilder(builder: (BuildContext context, StateSetter state) {
+        return AlertDialog(
           elevation: 4.0,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10.0))),
+
           content: Container(
-            alignment: Alignment.center,
-            height: MediaQuery.of(context).size.height / 3,
-            child: Container(
-              height: (MediaQuery.of(context).size.height / 100) * 40,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Text('ارسال الكارت'),
-                  TextField(
-                    controller: phoneController,
-                    autofocus: false,
-                    textAlign: TextAlign.center,
-                    focusNode: FocusNode(),
-                    style: TextStyle(fontSize: 14),
-                    maxLines: 1,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      hintText: "ادخل رقم الجوال المراد الارسال اليه",
-//                        border: InputBorder.none,
+            height: displayError ? MediaQuery.of(context).size.height / 3 : MediaQuery.of(context).size.height / 4,
+            width:
+            MediaQuery.of(context).size.width,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(top: 15.0),
+                  child: Text(
+                      ':عدد الكروت المراد إعادتها',
+                    style: TextStyle(color: Colors.black, fontSize: 20),
+                  ),
+                ),
+                Expanded(
+                    flex: 2,
+                    child: Container(
+                      margin: EdgeInsets.only(
+                          left: 5.0, right: 5.0),
+                      alignment:
+                      Alignment.centerLeft,
+                      child: Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment
+                            .center,
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () {
+                              if (returningCardsNumber <
+                                  card[
+                                  'mycredits']) {
+                                returningCardsNumber =
+                                    returningCardsNumber +
+                                        1;
+                                print(
+                                    '\n\n  returningCardsNumber; $returningCardsNumber\n\n');
+                              } else
+                                state(() {
+                                  displayError = true;
+                                });
+                            },
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  color: Colors
+                                      .grey
+                                      .withOpacity(
+                                      .7),
+                                  shape: BoxShape
+                                      .circle),
+                              child: Center(
+                                child: Text(
+                                  "+",
+                                  style: TextStyle(
+                                      color: Colors
+                                          .white),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 15, right: 15),
+                            child: Text(
+                              returningCardsNumber.toString(),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              if (returningCardsNumber >
+                                  1) {
+                                state(() {
+                                  displayError =
+                                  false;
+                                  returningCardsNumber =
+                                      returningCardsNumber -
+                                          1;
+                                  print(
+                                      '\n\n  returningCardsNumber; $returningCardsNumber\n\n');
+                                });
+                              }else
+                                state(() {
+                                  displayError = false;
+                                });
+                            },
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  color: Colors
+                                      .grey
+                                      .withOpacity(
+                                      .7),
+                                  shape: BoxShape
+                                      .circle),
+                              child: Center(
+                                child: Text(
+                                  "-",
+                                  style:
+                                  TextStyle(
+                                    color: Colors
+                                        .white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
+                // ignore: sdk_version_ui_as_code
+                if (displayError)
+                  Container(
+                    child: Text(
+                      'غير مسموح باعادة عدد اكبر من عدد بطاقاتك',
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                Container(
+                  width: MediaQuery.of(context)
+                      .size
+                      .width,
+                  child: Row(
+                    mainAxisAlignment:
+                    MainAxisAlignment
+                        .spaceEvenly,
                     children: <Widget>[
                       InkWell(
-                        child: Text('إرسال'),
-                        onTap: () {
-                          RegExp exp = new RegExp(r"(^[5]\d{8})");
-                          String str = phoneController.text;
-                          bool phone_exp = exp.hasMatch(str);
+                        child: Text('إعادة',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.green,
+                              fontWeight: FontWeight.normal),),
+                        onTap: () => getUserSID()
+                            .then((savedSID) =>
+                            getUserPhone().then(
+                                    (savedPhone) => /// todo add returnCardsNumber
+                                    returnCard(
+                                      savedSID,
+                                      card[
+                                      'namecard'],
+                                      savedPhone,
+                                    ).then(
+                                            (returnCardStatus) {
+                                          if (returnCardStatus) {
+                                            shopCartGlobalKey
+                                                .currentState
+                                                .showSnackBar(SnackBar(
+                                              content:
+                                              Text(
+                                                'تم إعادة الكارت بنجاح',
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ));
+                                            Timer(
+                                                Duration(seconds: 1),
+                                                    () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Profile())));
+                                          } else {
+                                            Navigator.pop(
+                                                context);
 
-                          if (phone_exp == false)
-                            shopCartGlobalKey.currentState
-                                .showSnackBar(SnackBar(
-                              backgroundColor: Colors.red,
-                              content: Text(
-                                'رقم الهاتف يجب أن يكون 9 أرقام ويبدأ برقم 5، مثال: 598765432',
-                                textAlign: TextAlign.center,
-                              ),
-                            ));
-                          else
-                            getUserSID().then((savedSID) {
-                              sendCard(
-                                      sid: savedSID,
-                                      pin: card['pin'],
-                                      phone: phoneController.text)
-                                  .then((sendingCardStatus) {
-                                print(
-                                    '\n\nbody is phoneController.text: ${phoneController.text}\n\n');
-                                print('\n\nbody is pin: ${card['pin']}\n\n');
-                                if (sendingCardStatus) {
-                                  shopCartGlobalKey.currentState
-                                      .showSnackBar(SnackBar(
-                                    content: Text(
-                                      'تم إسال الكارت بنجاح',
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ));
-                                  Timer(Duration(seconds: 2), () {
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => My_cards()));
-                                  });
-                                } else {
-                                  Navigator.pop(context);
-
-                                  shopCartGlobalKey.currentState
-                                      .showSnackBar(SnackBar(
-                                    backgroundColor: Colors.red,
-                                    content: Text(
-                                      'حدثت مشكلة اثناء إرسال الكارت برجاء المحاولة مرة اخرى!',
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ));
-                                }
-                              });
-                            });
-                        },
+                                            shopCartGlobalKey
+                                                .currentState
+                                                .showSnackBar(SnackBar(
+                                              content:
+                                              Text(
+                                                'حدثت مشكلة اثناء إعادة الكارت برجاء المحاولة لاحقا!',
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ));
+                                          }
+                                        }))),
                       ),
                       InkWell(
                         child: Text('الغاء'),
-                        onTap: () => Navigator.pop(context),
+                        onTap: () =>
+                            Navigator.pop(
+                                context),
                       )
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
+
+//  sendingAlert(StateSetter setter) {
+//    showDialog(
+//      context: context,
+//      builder: (context) => StatefulBuilder(
+//        builder: (BuildContext context, StateSetter state) => AlertDialog(
+//          elevation: 4.0,
+//          shape: RoundedRectangleBorder(
+//              borderRadius: BorderRadius.all(Radius.circular(10.0))),
+//          content: Container(
+//            alignment: Alignment.center,
+//            height: MediaQuery.of(context).size.height / 3,
+//            child: Container(
+//              height: (MediaQuery.of(context).size.height / 100) * 40,
+//              child: Column(
+//                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                children: <Widget>[
+//                  Text('ارسال الكارت'),
+//                  TextField(
+//                    controller: phoneController,
+//                    autofocus: false,
+//                    textAlign: TextAlign.center,
+//                    focusNode: FocusNode(),
+//                    style: TextStyle(fontSize: 14),
+//                    maxLines: 1,
+//                    keyboardType: TextInputType.phone,
+//                    decoration: InputDecoration(
+//                      hintText: "ادخل رقم الجوال المراد الارسال اليه",
+////                        border: InputBorder.none,
+//                    ),
+//                  ),
+//                  Row(
+//                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                    children: <Widget>[
+//                      InkWell(
+//                        child: Text('إرسال'),
+//                        onTap: () {
+//                          RegExp exp = new RegExp(r"(^[5]\d{8})");
+//                          String str = phoneController.text;
+//                          bool phone_exp = exp.hasMatch(str);
+//
+//                          if (phone_exp == false)
+//                            shopCartGlobalKey.currentState
+//                                .showSnackBar(SnackBar(
+//                              backgroundColor: Colors.red,
+//                              content: Text(
+//                                'رقم الهاتف يجب أن يكون 9 أرقام ويبدأ برقم 5، مثال: 598765432',
+//                                textAlign: TextAlign.center,
+//                              ),
+//                            ));
+//                          else
+//                            getUserSID().then((savedSID) {
+//                              sendCard(
+//                                      sid: savedSID,
+//                                      pin: card['pin'],
+//                                      phone: phoneController.text)
+//                                  .then((sendingCardStatus) {
+//                                print(
+//                                    '\n\nbody is phoneController.text: ${phoneController.text}\n\n');
+//                                print('\n\nbody is pin: ${card['pin']}\n\n');
+//                                if (sendingCardStatus) {
+//                                  shopCartGlobalKey.currentState
+//                                      .showSnackBar(SnackBar(
+//                                    content: Text(
+//                                      'تم إسال الكارت بنجاح',
+//                                      textAlign: TextAlign.center,
+//                                    ),
+//                                  ));
+//                                  Timer(Duration(seconds: 2), () {
+//                                    Navigator.pop(context);
+//                                    Navigator.pop(context);
+//                                    Navigator.pushReplacement(
+//                                        context,
+//                                        MaterialPageRoute(
+//                                            builder: (context) => My_cards()));
+//                                  });
+//                                } else {
+//                                  Navigator.pop(context);
+//
+//                                  shopCartGlobalKey.currentState
+//                                      .showSnackBar(SnackBar(
+//                                    backgroundColor: Colors.red,
+//                                    content: Text(
+//                                      'حدثت مشكلة اثناء إرسال الكارت برجاء المحاولة مرة اخرى!',
+//                                      textAlign: TextAlign.center,
+//                                    ),
+//                                  ));
+//                                }
+//                              });
+//                            });
+//                        },
+//                      ),
+//                      InkWell(
+//                        child: Text('الغاء'),
+//                        onTap: () => Navigator.pop(context),
+//                      )
+//                    ],
+//                  ),
+//                ],
+//              ),
+//            ),
+//          ),
+//        ),
+//      ),
+//    );
+//  }
 
   Future<String> getUserSID() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -478,53 +685,53 @@ class _ShopCardState extends State<ShopCard> {
     }
   }
 
-  Future<bool> sendCard({
-    String sid,
-    String phone,
-    String pin,
-  }) async {
-    Loader.showUnDismissibleLoader(shopCartGlobalKey.currentContext);
-
-    /// todo endpoint
-    /// https://app.rasseed.com/api/method/ash7anly.api.resend_sms_pin_code?
-    /// sid=39620135c3f577347fc9ca35f347da33fed63923a92ea537b71c39af
-    /// &phone=505632750
-    /// &pin=1234567
-
-    print("\n\n status code sid: $sid\n\n");
-    print("\n\n status code pin: $pin\n\n");
-    print("\n\n status code phone: $phone\n\n");
-
-    HttpClient httpClient = new HttpClient();
-    HttpClientRequest request = await httpClient.postUrl(Uri.parse(
-        "https://app.rasseed.com/api/method/ash7anly.api.resend_sms_pin_code?"));
-    request.headers.set('content-type', 'application/json');
-    request.add(utf8.encode(json.encode({
-      "sid": sid,
-      "phone": phone,
-      "pin": pin,
-    })));
-    HttpClientResponse response = await request.close();
-    print("\n\n status code is: ${response.statusCode}\n\n");
-
-    // todo - you should check the response.statusCode
-    String replay = await response.transform(utf8.decoder).join();
-    httpClient.close();
-    print("\n\n replay: ${replay}\n\n");
-
-    if (response.statusCode == 200) {
-      Loader.hideDialog(context);
-      print('\n\nbody is: ${json.decode(replay)['message']}\n\n');
-//      json.decode(replay)['message'].forEach((cardData){
-//        cardsDataList.add(cardData);
-//      });
-      return true;
-    } else {
-      Loader.hideDialog(context);
-      // error
-      return false;
-    }
-  }
+//  Future<bool> sendCard({
+//    String sid,
+//    String phone,
+//    String pin,
+//  }) async {
+//    Loader.showUnDismissibleLoader(shopCartGlobalKey.currentContext);
+//
+//    /// todo endpoint
+//    /// https://app.rasseed.com/api/method/ash7anly.api.resend_sms_pin_code?
+//    /// sid=39620135c3f577347fc9ca35f347da33fed63923a92ea537b71c39af
+//    /// &phone=505632750
+//    /// &pin=1234567
+//
+//    print("\n\n status code sid: $sid\n\n");
+//    print("\n\n status code pin: $pin\n\n");
+//    print("\n\n status code phone: $phone\n\n");
+//
+//    HttpClient httpClient = new HttpClient();
+//    HttpClientRequest request = await httpClient.postUrl(Uri.parse(
+//        "https://app.rasseed.com/api/method/ash7anly.api.resend_sms_pin_code?"));
+//    request.headers.set('content-type', 'application/json');
+//    request.add(utf8.encode(json.encode({
+//      "sid": sid,
+//      "phone": phone,
+//      "pin": pin,
+//    })));
+//    HttpClientResponse response = await request.close();
+//    print("\n\n status code is: ${response.statusCode}\n\n");
+//
+//    // todo - you should check the response.statusCode
+//    String replay = await response.transform(utf8.decoder).join();
+//    httpClient.close();
+//    print("\n\n replay: ${replay}\n\n");
+//
+//    if (response.statusCode == 200) {
+//      Loader.hideDialog(context);
+//      print('\n\nbody is: ${json.decode(replay)['message']}\n\n');
+////      json.decode(replay)['message'].forEach((cardData){
+////        cardsDataList.add(cardData);
+////      });
+//      return true;
+//    } else {
+//      Loader.hideDialog(context);
+//      // error
+//      return false;
+//    }
+//  }
 
 /*
 single card
@@ -595,9 +802,11 @@ multi cards
     // TODO: implement initState
     super.initState();
     setState(() {
-      card =/* widget.innerIndex != null
+      card =
+          /* widget.innerIndex != null
           ? widget.cardsData['cards'][widget.innerIndex]
-          :*/ widget.cardsData;
+          :*/
+          widget.cardsData;
 
       print('\n\ncardcardcard : $card\n\n');
       print('\n\n widget.cardsDatawidget.cardsData : ${widget.cardsData}\n\n');
@@ -1022,7 +1231,7 @@ multi cards
                                 children: <Widget>[
                                   Container(
                                     child: Text(
-                                      'بطاقتى',
+                                      'بطاقاتى',
                                       style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 15,
@@ -1067,11 +1276,16 @@ multi cards
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: <Widget>[
                                 InkWell(
-                                  onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              SendCard(card))),
+                                  onTap: () {
+                                    setState(() {
+                                      isExpanded = false;
+                                    });
+                                    return Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                SendCard(card)));
+                                  },
                                   //sendingAlert(shopCartGlobalKey.currentState.setState),
                                   child: ClipOval(
                                     clipper: CircleClipper(),
@@ -1114,80 +1328,7 @@ multi cards
                                   ),
                                 ),
                                 InkWell(
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) =>
-                                          AlertDialog(
-                                        title: Text('هل تريد إعادة الكارت؟'),
-                                        content: Container(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: <Widget>[
-                                              InkWell(
-                                                child: Text('إعادة'),
-                                                onTap: () => getUserSID().then(
-                                                    (savedSID) => getUserPhone()
-                                                        .then((savedPhone) =>
-                                                            returnCard(
-                                                              savedSID,
-                                                              card['namecard'],
-                                                              savedPhone,
-                                                            ).then(
-                                                                (returnCardStatus) {
-                                                              if (returnCardStatus) {
-                                                                shopCartGlobalKey
-                                                                    .currentState
-                                                                    .showSnackBar(
-                                                                        SnackBar(
-                                                                  content: Text(
-                                                                    'تم إعادة الكارت بنجاح',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                  ),
-                                                                ));
-                                                                Timer(
-                                                                    Duration(
-                                                                        seconds:
-                                                                            1),
-                                                                    () => Navigator.pushReplacement(
-                                                                        context,
-                                                                        MaterialPageRoute(
-                                                                            builder: (context) =>
-                                                                                Profile())));
-                                                              } else {
-                                                                Navigator.pop(
-                                                                    context);
-
-                                                                shopCartGlobalKey
-                                                                    .currentState
-                                                                    .showSnackBar(
-                                                                        SnackBar(
-                                                                  content: Text(
-                                                                    'حدثت مشكلة اثناء إعادة الكارت برجاء المحاولة لاحقا!',
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                  ),
-                                                                ));
-                                                              }
-                                                            }))),
-                                              ),
-                                              InkWell(
-                                                child: Text('الغاء'),
-                                                onTap: () =>
-                                                    Navigator.pop(context),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
+                                  onTap: ()=> returningAlert(shopCartGlobalKey.currentState.setState),
                                   child: ClipOval(
                                     clipper: CircleClipper(),
                                     child: Container(
@@ -1232,11 +1373,11 @@ multi cards
                                 /// if cards used disappear Transfer
                                 widget.isNewCard
                                     ? InkWell(
-                                  onTap: () =>   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              TransferCard(card))),
+                                        onTap: () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    TransferCard(card))),
                                         child: ClipOval(
                                           clipper: CircleClipper(),
                                           child: Container(

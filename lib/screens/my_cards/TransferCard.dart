@@ -166,6 +166,19 @@ class _TransferCardState extends State<TransferCard> {
         ),
       ),
     );
+
+    Timer(
+        Duration(milliseconds: 500),
+            () {
+              Loader.hideDialog(context);
+              Loader.hideDialog(context);
+              Loader.hideDialog(context);
+//              return Navigator.pushReplacement(
+//            context,
+//            MaterialPageRoute(
+//                builder: (context) =>
+//                    My_cards()));
+            });
   }
 
   transferringAlert(StateSetter setter) {
@@ -267,7 +280,9 @@ class _TransferCardState extends State<TransferCard> {
                               transferCard(
                                   sid: savedSID,
                                   cardName: card['namecard'],
-                                  toUserPhone: phoneController.text)
+                                  toUserPhone: phoneController.text,
+                                quantity:cardsQuantityController.text!= null? int.parse(cardsQuantityController.text.toString()) : 1
+                              )
                                   .then((transferringCardStatus) {
                                 print(
                                     '\n\nbody is phoneController.text: ${phoneController.text}\n\n');
@@ -276,6 +291,7 @@ class _TransferCardState extends State<TransferCard> {
                                   Loader.hideDialog(context);
                                   Loader.hideDialog(context);
                                   cardTransferAlert(setState);
+
                                 } else if (transferringCardStatus == 'failed') {
                                   Loader.hideDialog(context);
                                   Loader.hideDialog(context);
@@ -663,6 +679,16 @@ print('\n\n cardsQuantityController.text :: ${cardsQuantityController.text.lengt
                               ),
                             ));
 
+
+                          else if (int.parse(cardsQuantityController.text.toString()) > card['mycredits'])
+                            shopCartGlobalKey.currentState
+                                .showSnackBar(SnackBar(
+                              backgroundColor: Colors.red,
+                              content: Text(
+                                'لا يمكن تحويل عدد اكبر من الكروت التى لديك',
+                                textAlign: TextAlign.center,
+                              ),
+                            ));
 
                           else if (phone_exp == false)
                             shopCartGlobalKey.currentState

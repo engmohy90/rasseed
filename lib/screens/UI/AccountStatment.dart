@@ -94,7 +94,7 @@ class _AccountStatementState extends State<AccountStatement> {
                         Row(
                           children: <Widget>[
                             Text(
-                              'كرت',
+                              'بطاقه',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,

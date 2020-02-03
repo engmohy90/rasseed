@@ -289,7 +289,10 @@ class _SendCardState extends State<SendCard> {
                                 if (sendingCardStatus == 'success') {
                                   Loader.hideDialog(context);
                                   Loader.hideDialog(context);
-                                  cardSentAlert(setState);
+                                  Loader.hideDialog(context);
+                                  /// todo check navigation
+//                                  cardSentAlert(setState);
+
 //                                  shopCartGlobalKey.currentState
 //                                      .showSnackBar(SnackBar(
 //                                    content: Text(
@@ -399,6 +402,9 @@ class _SendCardState extends State<SendCard> {
       "pin": pin,
     })));
     HttpClientResponse response = await request.close();
+    print("\n\n : sid, $sid \n\n");
+    print("\n\n phone:  $phone \n\n");
+    print("\n\n pin is: $pin \n\n");
     print("\n\n status code is: ${response.statusCode}\n\n");
 
     // todo - you should check the response.statusCode

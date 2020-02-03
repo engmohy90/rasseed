@@ -24,7 +24,7 @@ class _InvitationPointsState extends State<InvitationPoints> {
   String deduct = 'deduct';
 
   List<dynamic> userBalanceSheetList = List();
-  List<dynamic> userBalanceCardsList;
+//  List<dynamic> userBalanceCardsList;
 
   userRecipeWidget(List<dynamic> cardsList) {
     return GridView.builder(
@@ -79,6 +79,7 @@ class _InvitationPointsState extends State<InvitationPoints> {
                                 fontSize: 14,
                               ),
                             ),
+                            SizedBox(width: 2,),
                             Text(
                               '${cardsList[index]['value']}',
                               textAlign: TextAlign.center,
@@ -93,7 +94,7 @@ class _InvitationPointsState extends State<InvitationPoints> {
                         Row(
                           children: <Widget>[
                             Text(
-                              'كرت',
+                              'بطاقه',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,
@@ -101,6 +102,7 @@ class _InvitationPointsState extends State<InvitationPoints> {
                                 fontSize: 14,
                               ),
                             ),
+                            SizedBox(width: 2,),
                             Text(
                               '${cardsList[index]['quantity']}',
                               textAlign: TextAlign.center,
@@ -155,35 +157,35 @@ https://app.rasseed.com/api/method/ash7anly.api.balance_sheet?
    */
 
   Future<bool> getUserRecipe(String sid) async {
-//    Loader.showUnDismissibleLoader(context);
-//
-//    /// todo endpoint
-//    HttpClient httpClient = new HttpClient();
-//    HttpClientRequest request = await httpClient.postUrl(Uri.parse(
-//        "https://www.rasseed.com/api/method/ash7anly.mobile_api.convert_point_to_balance"));
-//    request.headers.set('content-type', 'application/json');
-//    request.add(utf8.encode(json.encode({"sid": sid})));
-//    HttpClientResponse response = await request.close();
-//
-//    print("\n\n status code is: ${response.statusCode}\n\n");
-//
-//    // todo - you should check the response.statusCode
-//    String replay = await response.transform(utf8.decoder).join();
-//    httpClient.close();
-//    print("\n\n replay: ${replay}\n\n");
-//
-//    if (response.statusCode == 200) {
-//      Loader.hideDialog(context);
-//      print('\n\n getUserRecipe body is: ${json.decode(replay)['message']}\n\n');
-//      setState(() => userBalanceSheetList = json.decode(replay)['message']);
-//      return true;
-//    } else {
-//      Loader.hideDialog(context);
-//      setState(() {
-//        userBalanceSheetList = List();
-//      });
-//      return false;
-//    }
+    Loader.showUnDismissibleLoader(context);
+
+    /// todo endpoint
+    HttpClient httpClient = new HttpClient();
+    HttpClientRequest request = await httpClient.postUrl(Uri.parse(
+        "https://app.rasseed.com/api/method/ash7anly.api.balance_sheet"));
+    request.headers.set('content-type', 'application/json');
+    request.add(utf8.encode(json.encode({"sid": sid})));
+    HttpClientResponse response = await request.close();
+
+    print("\n\n status code is: ${response.statusCode}\n\n");
+
+    // todo - you should check the response.statusCode
+    String replay = await response.transform(utf8.decoder).join();
+    httpClient.close();
+    print("\n\n replay: ${replay}\n\n");
+
+    if (response.statusCode == 200) {
+      Loader.hideDialog(context);
+      print('\n\n getUserRecipe body is: ${json.decode(replay)['message']}\n\n');
+      setState(() => userBalanceSheetList = json.decode(replay)['message']);
+      return true;
+    } else {
+      Loader.hideDialog(context);
+      setState(() {
+        userBalanceSheetList = List();
+      });
+      return false;
+    }
   }
 
   Future<bool> convertUserPoints(String sid) async {
