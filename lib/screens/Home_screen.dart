@@ -141,7 +141,7 @@ class _Home_screenState extends State<Home_screen> {
     HttpClient httpClient = new HttpClient();
     HttpClientRequest request = await httpClient.getUrl(
       Uri.parse(
-          "https://www.rasseed.com/api/method/ash7anly.flutter_api.get_main_class"),
+          "https://www.rasseed.com/api/method/ash7anly.flutter_api.get_main_class?_lang=ar"),
     );
     HttpClientResponse response = await request.close();
     // todo - you should check the response.statusCode
@@ -465,7 +465,7 @@ class _Home_screenState extends State<Home_screen> {
                                         child: Container(
                                           child: Image.network(
                                             Uri.encodeFull(
-                                                "https://www.rasseed.com${imageData['logo']}"),
+                                                "https://www.rasseed.com${imageData['flutter_img']}"),
                                           ),
                                         ),
                                       ),
@@ -558,7 +558,7 @@ class _Home_screenState extends State<Home_screen> {
                                         ),
                                         child: Image.network(
                                             Uri.encodeFull(
-                                                "https://www.rasseed.com${image_data[index]['logo']}"),
+                                                "https://www.rasseed.com${image_data[index]['flutter_img']}"),
                                             fit: BoxFit.contain),
                                       ),
                                     );

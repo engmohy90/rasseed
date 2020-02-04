@@ -194,7 +194,7 @@ class _pervious_cardsState extends State<pervious_cards> {
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.w300,
-                                            fontSize: 15,
+                                            fontSize: 12,
                                           ),
                                         ),
                                       ],
