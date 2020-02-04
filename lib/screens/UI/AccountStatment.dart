@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:rasseed/screens/UI/BankTransfer.dart';
 import 'package:rasseed/screens/payment/UserRemittances.dart';
 import 'package:rasseed/utils/center_loader.dart';
 import 'package:rasseed/utils/loader.dart';
@@ -300,6 +301,9 @@ https://app.rasseed.com/api/method/ash7anly.api.balance_sheet?
                         ),
                         Expanded(
                           child: InkWell(
+                            onTap: (){
+                              Navigator.push(context, MaterialPageRoute(builder:(context)=> BankTransfer()));
+                            },
                             child: Container(
                               margin: EdgeInsets.all(10.0),
                               padding: EdgeInsets.all(10.0),

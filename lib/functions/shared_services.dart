@@ -26,7 +26,7 @@ Future<List<String>> getListFromShared() async {
   return await prefs.getStringList("savedList") ?? List<String>();
 }
 
-void removeListFromShared() async {
+Future removeListFromShared() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.remove("savedList");
   await prefs.remove("totalPrice");

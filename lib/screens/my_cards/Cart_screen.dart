@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:rasseed/functions/shared_services.dart';
 import 'package:rasseed/screens/my_cards/GET_CURRENT_URL.dart';
+import 'package:rasseed/screens/my_cards/my_cards.dart';
 import 'package:rasseed/screens/payment/PaymentMethod.dart';
 import 'package:rasseed/utils/loader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,7 +28,103 @@ class _Cart_screenState extends State<Cart_screen> {
 
   GlobalKey<ScaffoldState> cartScreenKey = GlobalKey();
 
+  String currentBalance = '0';
+
+  Future<String> getCurrentBalance(String sid) async {
+    Loader.showUnDismissibleLoader(context);
+
+    /// todo endpoint
+    HttpClient httpClient = new HttpClient();
+    HttpClientRequest request = await httpClient.postUrl(Uri.parse(
+        "https://app.rasseed.com/api/method/ash7anly.mobile_api.get_balance?"));
+    request.headers.set('content-type', 'application/json');
+    request.add(utf8.encode(json.encode({"sid": sid})));
+    HttpClientResponse response = await request.close();
+
+    print("\n\n status code is: ${response.statusCode}\n\n");
+
+    // todo - you should check the response.statusCode
+    String replay = await response.transform(utf8.decoder).join();
+    httpClient.close();
+    print("\n\n replay: ${replay}\n\n");
+
+    if (response.statusCode == 200) {
+      Loader.hideDialog(context);
+      print('\n\nbody is: ${json.decode(replay)['message']}\n\n');
+      print(
+          '\n\n json.decode(replay)[message] is: ${json.decode(replay)['message']}\n\n');
+      print(
+          '\n\n json.decode(replay)[message][balance] is: ${json.decode(replay)['message']['balance']}\n\n');
+      setState(() => currentBalance =
+          json.decode(replay)['message']['balance'] != null
+              ? json.decode(replay)['message']['balance'].toString()
+              : '0.0');
+    } else {
+      Loader.hideDialog(context);
+    }
+  }
+
+  Future<String> buyFromMyAccount(String sid) async {
+    Loader.showUnDismissibleLoader(context);
+    List<Map> apiList = List();
+
+    userCardsList.forEach((item){
+      print("\n\n item userCardsList    : $item\n\n");
+      apiList.add(
+      {"quantity":json.decode(item)['apiObjectCount'],"card":json.decode(json.decode(item)['apiObject'])['name']}
+      );
+    });
+
+    apiList.forEach((item){
+      print("\n\n item itemitem    : $item\n\n");
+    });
+
+    print("\n\n item fufgbnmhu    : ${jsonEncode({"order_status":"open","is_bank":1,"order_details":apiList})}\n\n");
+    HttpClient httpClient = new HttpClient();
+    HttpClientRequest request = await httpClient.postUrl(
+        Uri.parse("https://app.rasseed.com/api/resource/Purchase%20Orders"));
+    request.headers.set('content-type', 'application/json');
+    request.add(utf8.encode(json.encode({
+      "data": jsonEncode({"order_status":"open","is_bank":1,"order_details":apiList}),//"{\"order_status\":\"open\",\"is_bank\":\"1\",\"order_details\":[{\"quantity\":1,\"card\":\"Card00120\"}]}",//${jsonEncode(apiList)}",
+      "sid": sid
+    })));
+//    request.add(utf8.encode(json.encode({
+//      "data":
+//          "{\"order_status\":\"open\",\"is_bank\":\"1\",\"order_details\":[{\"quantity\":1,\"card\":\"Card00002\"}]}",
+//      "sid": "64fc4904519bfe16e91ca4c277fc54fc4de1a4006847176fa76aee13"
+//    })));
+    HttpClientResponse response = await request.close();
+    String replay = await response.transform(utf8.decoder).join();
+    httpClient.close();
+    print("\n\n replay: $replay\n\n");
+
+    print("\n\n response.statusCode: ${response.statusCode}\n\n");
+
+    if (response.statusCode == 200) {
+      final body = json.decode(replay);
+
+      removeListFromShared().then((dummy){
+        Loader.hideDialog(context);
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (BuildContext context) => My_cards()));
+      });
+
+    } else {
+      Loader.hideDialog(context);
+      cartScreenKey.currentState
+          .showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(
+            'فشل عمليه الشراء',
+            textAlign: TextAlign.center,
+          )));
+    }
+
+    return "done";
+  }
+
   Future<String> buy() async {
+    Loader.showUnDismissibleLoader(context);
     print("buy&&&&buy");
 
     HttpClient httpClient = new HttpClient();
@@ -60,19 +157,23 @@ class _Cart_screenState extends State<Cart_screen> {
               )));
     } else {
 //        message_error_controoler.text = json.decode(replay)['message'];
+      Loader.hideDialog(context);
     }
 
     return "done";
   }
 
-  Future<String> getPaymentName() async {
+  Future<String> getUserSID() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('paymentName');
+    print('\n\n\n user sid: ${prefs.getString('client_auth')}\n\n\n');
+    return prefs.getString('client_auth');
   }
-
   @override
   void initState() {
     super.initState();
+    getUserSID().then((savedSID) {
+      getCurrentBalance(savedSID);
+    });
     getListFromShared().then((savedList) {
       print('\n\nsaved list: $savedList\n\n');
       print('\n\nsaved list.length: ${savedList.length}\n\n');
@@ -117,20 +218,28 @@ class _Cart_screenState extends State<Cart_screen> {
                     padding: const EdgeInsets.only(left: 20, bottom: 5, top: 5),
                     child: GestureDetector(
                       onTap: () {
-                        getPaymentName().then((paymentName) => paymentName !=
-                                null
-                            ? buy()
-                            : cartScreenKey.currentState.showSnackBar(SnackBar(
-                          backgroundColor: Colors.red,
-                                content: Text(
-                                'يجب اخيار طريقه الدفع اولا',
-                                textAlign: TextAlign.center,
-                              ))));
-
-//                        Navigator.push(
-//                            context,
-//                            MaterialPageRoute(
-//                                builder: (context) => Receipt()));
+                        double.parse(currentBalance) >= totalPrice ?
+                        getPaymentMethodName().then((paymentName) =>
+                            paymentName != null
+                                ? paymentName == 'رصيدي'
+                                    ? getUserSID().then((savedSID){
+                            buyFromMyAccount(savedSID);
+                            })
+                                    : buy()
+                                : cartScreenKey.currentState
+                                    .showSnackBar(SnackBar(
+                                        backgroundColor: Colors.red,
+                                        content: Text(
+                                          'يجب اخيار طريقه الدفع اولا',
+                                          textAlign: TextAlign.center,
+                                        ))))
+                            : cartScreenKey.currentState
+                            .showSnackBar(SnackBar(
+                            backgroundColor: Colors.red,
+                            content: Text(
+                              'ليس لديك رصيد كافي!',
+                              textAlign: TextAlign.center,
+                            )));
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -654,7 +763,7 @@ class _Cart_screenState extends State<Cart_screen> {
               ),
 
               ///  add payment method names
-              paymentMethod.length > 0
+              paymentMethod != null && paymentMethod.length > 0
                   ? Padding(
                       padding: const EdgeInsets.only(right: 15, left: 15),
                       child: Container(

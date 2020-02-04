@@ -6,6 +6,7 @@ import 'dart:ui' as prefix0;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:rasseed/screens/Home_screen.dart';
 import 'package:rasseed/screens/my_cards/SendCard.dart';
 import 'package:rasseed/screens/my_cards/TransferCard.dart';
 import 'package:rasseed/screens/my_cards/my_cards.dart';
@@ -328,9 +329,11 @@ class _ShopCardState extends State<ShopCard> {
                               if (returningCardsNumber <
                                   card[
                                   'mycredits']) {
-                                returningCardsNumber =
-                                    returningCardsNumber +
-                                        1;
+                                state(() {
+                                  returningCardsNumber =
+                                      returningCardsNumber +
+                                          1;
+                                });
                                 print(
                                     '\n\n  returningCardsNumber; $returningCardsNumber\n\n');
                               } else
@@ -452,7 +455,7 @@ class _ShopCardState extends State<ShopCard> {
                                             ));
                                             Timer(
                                                 Duration(seconds: 1),
-                                                    () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Profile())));
+                                                    () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home_screen())));
                                           } else {
                                             Navigator.pop(
                                                 context);
@@ -686,7 +689,6 @@ class _ShopCardState extends State<ShopCard> {
       // error
     }
   }
-
 
 //  Future<bool> sendCard({
 //    String sid,
@@ -1278,11 +1280,10 @@ multi cards
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: <Widget>[
-
                                 !widget.isNewCard  ? InkWell(
                                   onTap: () {
 
-                                      Share.share(" Pin code for " +  " with value " +  " SAR is " + "\nshared by @RasseedApp.\n\nDownload rasseed app from :\n- IOS : https://goo.gl/v53oxs\n- Android : https://goo.gl/Se7WxY");
+                                    Share.share(" Pin code for " +  " with value " +  " SAR is " + "\nshared by @RasseedApp.\n\nDownload rasseed app from :\n- IOS : https://goo.gl/v53oxs\n- Android : https://goo.gl/Se7WxY");
 
                                     setState(() {
                                       isExpanded = false;
@@ -1294,11 +1295,11 @@ multi cards
 //                                        MaterialPageRoute(
 //                                            builder: (context) =>
 //                                                ShareCard()))
-                                    ;
+                                        ;
                                   },
                                   //sendingAlert(shopCartGlobalKey.currentState.setState),
 
-                                   child: ClipOval(
+                                  child: ClipOval(
                                     clipper: CircleClipper(),
                                     child: Container(
                                       width:
@@ -1390,8 +1391,7 @@ multi cards
                                       ),
                                     ),
                                   ),
-                                )
-                                    : Container(),
+                                ): Container(),
                                 widget.isNewCard  ? InkWell(
                                   onTap: ()=> returningAlert(shopCartGlobalKey.currentState.setState),
                                   child: ClipOval(
@@ -1433,8 +1433,7 @@ multi cards
                                       ),
                                     ),
                                   ),
-                                )
-                                    : Container(),
+                                ): Container(),
 
                                 /// if cards used disappear Transfer
                                 widget.isNewCard
