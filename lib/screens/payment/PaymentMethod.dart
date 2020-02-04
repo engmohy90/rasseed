@@ -3,8 +3,6 @@ import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:rasseed/functions/shared_services.dart';
 import 'package:rasseed/utils/bottom_sheet_customize.dart';
 
-import 'EditPaymentMethod.dart';
-
 class PaymentMethod extends StatefulWidget {
   @override
   _PaymentMethodState createState() => _PaymentMethodState();
@@ -250,6 +248,75 @@ class _PaymentMethodState extends State<PaymentMethod> {
                         Container(
                           margin: EdgeInsets.only(right: 25.0),
                           child: Text("حواله بنكية",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  color: Color.fromRGBO(69, 57, 137, 1.0),
+                                  fontSize: 15)),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(right: 15.0),
+                          child: Icon(
+                            Icons.credit_card,
+                            size: 40,
+                            color: Color.fromRGBO(69, 57, 137, 1.0),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 15.0),
+              width: MediaQuery.of(context).size.width,
+              height: .5,
+              color: Colors.grey.withOpacity(.5),
+            ),
+            InkWell(
+              onTap: () => addPaymentMethodName('رصيدي')
+                  .then((valueSaved) => valueSaved
+                      ? Navigator.pop(context)
+                      : showRoundedModalBottomSheet(
+                          autoResize: true,
+                          dismissOnTap: false,
+                          context: context,
+                          radius: 20.0,
+                          // This is the default
+                          color: Colors.white,
+                          // Also default
+                          builder: (context) => Container(
+                                alignment: Alignment.topRight,
+                                margin: EdgeInsets.only(top: 15, right: 20),
+                                child: Text(
+                                  'لم يتم حفظ طريقة الدفع, برجاء المحاولة ثانية!',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black),
+                                ),
+                              ))),
+              child: Container(
+                margin: EdgeInsets.only(top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    paymentMethod != null && paymentMethod == 'رصيدي'
+                        ? Container(
+                            margin: EdgeInsets.only(left: 15.0, top: 10.0),
+                            child: Icon(Icons.check,
+                                size: 25,
+                                color: Color.fromRGBO(69, 57, 137, 1.0)),
+                          )
+                        : Container(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(right: 25.0),
+                          child: Text("رصيدي",
                               style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                   color: Color.fromRGBO(69, 57, 137, 1.0),
