@@ -60,7 +60,7 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
       ],
       theme: ThemeData(fontFamily: 'Roboto'),
-      home: nextWidget /*client_auth.isNotEmpty ? Home_screen() : FlipPage()*/,
+      home: FlipPage() /*client_auth.isNotEmpty ? Home_screen() : FlipPage()*/,
     );
   }
 }

@@ -226,7 +226,7 @@ class _ZienCardState extends State<ZienCard> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
-                            operator[0]['logo'] != null
+                            operator[0]['flutter_img'] != null
                                 ? Container(
                                     margin: EdgeInsets.only(
                                         top:
@@ -257,7 +257,7 @@ class _ZienCardState extends State<ZienCard> {
                                       padding: const EdgeInsets.all(12.0),
                                       child: Image.network(
                                         Uri.encodeFull(
-                                            "https://www.rasseed.com${operator[0]['logo']}"),
+                                            "https://www.rasseed.com${operator[0]['flutter_img']}"),
                                       ),
                                     ),
                                   )
@@ -338,6 +338,7 @@ class _ZienCardState extends State<ZienCard> {
                                     onTap: () {
                                       setState(() {
                                         cardsListColor = Colors.white;
+
                                         cardsList = operator[index]['cards'];
                                         print(
                                             '\n\nselectedCard[instruction_1_ar]: ${operator[index]['instruction_1_ar']}\n\n');
@@ -376,7 +377,7 @@ class _ZienCardState extends State<ZienCard> {
                                           border: Border.all(
                                               color: listBorderClass[index])),
                                       child: Text(
-                                        '${operator[index]['class']}',
+                                        '${operator[index]['child_title_ar']}',
                                         style: TextStyle(
                                             color: Color.fromRGBO(
                                                 69, 57, 137, 1.0),

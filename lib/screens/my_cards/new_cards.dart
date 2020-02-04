@@ -124,7 +124,7 @@ class _new_cardsState extends State<new_cards> {
     request.headers.set('content-type', 'application/json');
 
     request.add(utf8.encode(json.encode({"sid": sid})));
-
+print("BBBBBBBB ${request}");
     HttpClientResponse response = await request.close();
 
     print("\n\n status code is: ${response.statusCode}\n\n");
@@ -268,7 +268,7 @@ class _new_cardsState extends State<new_cards> {
 //                  List<dynamic> cardsList = cardsDataList[index]['cards'];
                   return Container(
                     child: cardsDataList != null? GridView.builder(
-                        itemCount: cardsDataList.length,
+                        itemCount: 1,
                         physics: NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         primary: false,
@@ -323,7 +323,7 @@ class _new_cardsState extends State<new_cards> {
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: <Widget>[
                                         Text(
-                                          '${cardsDataList[innerIndex]['value']}',
+                                          '${cardsDataList[index]['value']}',
                                           textAlign:TextAlign.center,
                                           style: TextStyle(
                                               color: Colors.black,

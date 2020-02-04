@@ -13,6 +13,7 @@ import 'package:rasseed/screens/settings/Profile.dart';
 import 'package:rasseed/utils/custom_circle_avatar.dart';
 import 'package:rasseed/utils/loader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:share/share.dart';
 
 class ShopCard extends StatefulWidget {
   ShopCard(this.cardsData, {this.isNewCard});
@@ -91,6 +92,7 @@ class _ShopCardState extends State<ShopCard> {
   TextEditingController phoneController = TextEditingController();
 
   bool displayError = false;
+
 
   scrappingAlert(StateSetter setter) {
     setter(() {
@@ -685,6 +687,7 @@ class _ShopCardState extends State<ShopCard> {
     }
   }
 
+
 //  Future<bool> sendCard({
 //    String sid,
 //    String phone,
@@ -1275,7 +1278,68 @@ multi cards
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: <Widget>[
-                                InkWell(
+
+                                !widget.isNewCard  ? InkWell(
+                                  onTap: () {
+
+                                      Share.share(" Pin code for " +  " with value " +  " SAR is " + "\nshared by @RasseedApp.\n\nDownload rasseed app from :\n- IOS : https://goo.gl/v53oxs\n- Android : https://goo.gl/Se7WxY");
+
+                                    setState(() {
+                                      isExpanded = false;
+                                    });
+
+
+//                                    return Navigator.push(
+//                                        context,
+//                                        MaterialPageRoute(
+//                                            builder: (context) =>
+//                                                ShareCard()))
+                                    ;
+                                  },
+                                  //sendingAlert(shopCartGlobalKey.currentState.setState),
+
+                                   child: ClipOval(
+                                    clipper: CircleClipper(),
+                                    child: Container(
+                                      width:
+                                      MediaQuery.of(context).size.width / 6,
+                                      height:
+                                      MediaQuery.of(context).size.width / 6,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                            width: 2,
+                                            color:
+                                            Colors.grey.withOpacity(0.3)),
+                                      ),
+                                      child: Container(
+                                        width:
+                                        MediaQuery.of(context).size.width /
+                                            5,
+                                        height:
+                                        MediaQuery.of(context).size.width /
+                                            5,
+                                        padding: EdgeInsets.all(5.0),
+                                        child: Column(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                            children: <Widget>[
+                                              Icon(
+                                                Icons.send,
+                                                color: Color.fromRGBO(
+                                                    69, 57, 137, 1.0),
+                                                size: 20.0,
+                                              ),
+                                              Text('مشاركه'),
+                                            ]),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                    : Container(),
+                                widget.isNewCard  ? InkWell(
                                   onTap: () {
                                     setState(() {
                                       isExpanded = false;
@@ -1326,8 +1390,9 @@ multi cards
                                       ),
                                     ),
                                   ),
-                                ),
-                                InkWell(
+                                )
+                                    : Container(),
+                                widget.isNewCard  ? InkWell(
                                   onTap: ()=> returningAlert(shopCartGlobalKey.currentState.setState),
                                   child: ClipOval(
                                     clipper: CircleClipper(),
@@ -1368,7 +1433,8 @@ multi cards
                                       ),
                                     ),
                                   ),
-                                ),
+                                )
+                                    : Container(),
 
                                 /// if cards used disappear Transfer
                                 widget.isNewCard
