@@ -64,17 +64,35 @@ class _Cart_screenState extends State<Cart_screen> {
     }
   }
 
-  Future<String> buyFromMyAccount() async {
+  Future<String> buyFromMyAccount(String sid) async {
     Loader.showUnDismissibleLoader(context);
+    List<Map> apiList = List();
+
+    userCardsList.forEach((item){
+      print("\n\n item userCardsList    : $item\n\n");
+      apiList.add(
+      {"quantity":json.decode(item)['apiObjectCount'],"card":json.decode(json.decode(item)['apiObject'])['name']}
+      );
+    });
+
+    apiList.forEach((item){
+      print("\n\n item itemitem    : $item\n\n");
+    });
+
+    print("\n\n item fufgbnmhu    : ${jsonEncode({"order_status":"open","is_bank":1,"order_details":apiList})}\n\n");
     HttpClient httpClient = new HttpClient();
     HttpClientRequest request = await httpClient.postUrl(
         Uri.parse("https://app.rasseed.com/api/resource/Purchase%20Orders"));
     request.headers.set('content-type', 'application/json');
     request.add(utf8.encode(json.encode({
-      "data":
-          "{\"order_status\":\"open\",\"is_bank\":\"1\",\"order_details\":[{\"quantity\":1,\"card\":\"Card00002\"}]}",
-      "sid": "64fc4904519bfe16e91ca4c277fc54fc4de1a4006847176fa76aee13"
+      "data": jsonEncode({"order_status":"open","is_bank":1,"order_details":apiList}),//"{\"order_status\":\"open\",\"is_bank\":\"1\",\"order_details\":[{\"quantity\":1,\"card\":\"Card00120\"}]}",//${jsonEncode(apiList)}",
+      "sid": sid
     })));
+//    request.add(utf8.encode(json.encode({
+//      "data":
+//          "{\"order_status\":\"open\",\"is_bank\":\"1\",\"order_details\":[{\"quantity\":1,\"card\":\"Card00002\"}]}",
+//      "sid": "64fc4904519bfe16e91ca4c277fc54fc4de1a4006847176fa76aee13"
+//    })));
     HttpClientResponse response = await request.close();
     String replay = await response.transform(utf8.decoder).join();
     httpClient.close();
@@ -84,14 +102,22 @@ class _Cart_screenState extends State<Cart_screen> {
 
     if (response.statusCode == 200) {
       final body = json.decode(replay);
-      String signature = body["data"]["signature"];
-      print("\n\n signature: $signature\n\n");
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (BuildContext context) => My_cards()));
+
+      removeListFromShared().then((dummy){
+        Loader.hideDialog(context);
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (BuildContext context) => My_cards()));
+      });
+
     } else {
       Loader.hideDialog(context);
-
-//        message_error_controoler.text = json.decode(replay)['message'];
+      cartScreenKey.currentState
+          .showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(
+            'فشل عمليه الشراء',
+            textAlign: TextAlign.center,
+          )));
     }
 
     return "done";
@@ -196,7 +222,9 @@ class _Cart_screenState extends State<Cart_screen> {
                         getPaymentMethodName().then((paymentName) =>
                             paymentName != null
                                 ? paymentName == 'رصيدي'
-                                    ? buyFromMyAccount()
+                                    ? getUserSID().then((savedSID){
+                            buyFromMyAccount(savedSID);
+                            })
                                     : buy()
                                 : cartScreenKey.currentState
                                     .showSnackBar(SnackBar(

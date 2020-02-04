@@ -338,7 +338,6 @@ class _ZienCardState extends State<ZienCard> {
                                     onTap: () {
                                       setState(() {
                                         cardsListColor = Colors.white;
-
                                         cardsList = operator[index]['cards'];
                                         print(
                                             '\n\nselectedCard[instruction_1_ar]: ${operator[index]['instruction_1_ar']}\n\n');

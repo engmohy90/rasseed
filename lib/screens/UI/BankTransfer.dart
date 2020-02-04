@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:rasseed/screens/Home_screen.dart';
 import 'package:rasseed/utils/loader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,6 +13,7 @@ class BankTransfer extends StatefulWidget {
 }
 
 class _BankTransferState extends State<BankTransfer> {
+  GlobalKey<ScaffoldState> bankTransferScreenKey = GlobalKey();
   TextEditingController fullName = TextEditingController();
   TextEditingController cardNumber = new TextEditingController();
   TextEditingController amount = new TextEditingController();
@@ -105,7 +107,9 @@ class _BankTransferState extends State<BankTransfer> {
 
     if (notesInput && amountInput && cardInput && nameInput && bankInput) {
       print("valid");
-      bank_transfer();
+      getUserSID().then((savedSID){
+        bank_transfer(savedSID);
+      });
     }
   }
 
@@ -262,7 +266,7 @@ https://app.rasseed.com/api/method/ash7anly.api.get_bank?_lang=ar&sid=64fc490451
     }
   }
 
-  Future<String> bank_transfer() async {
+  Future<String> bank_transfer(String sid) async {
     Loader.showUnDismissibleLoader(context);
 
     print("bank_transfer");
@@ -272,30 +276,51 @@ https://app.rasseed.com/api/method/ash7anly.api.get_bank?_lang=ar&sid=64fc490451
     String cardNumber_ = cardNumber.text;
 
     HttpClient httpClient = new HttpClient();
-    HttpClientRequest request = await httpClient.postUrl(Uri.parse("https://www.rasseed.com/api/resource/Bank Payment"));
+    HttpClientRequest request = await httpClient.postUrl(Uri.parse("https://www.rasseed.com/api/resource/Bank%20Payment"));
     request.headers.set('content-type', 'application/json');
     request.add(utf8.encode(json.encode(
 
-//        {
-//          "data": "{\"bank\":\"f92ebcb7c8\",\"fullname\":\"$fullName_\",\"account_number\":\"$cardNumber_\",\"amount\":\"$amount_\",\"workflow_state\":\"Pending\",\"status\":\"pending\",\"supported_bank\":\"da5694645f\"}",
-//          "sid": "64fc4904519bfe16e91ca4c277fc54fc4de1a4006847176fa76aee13"
-//        }
-
         {
-          "data": "{\"bank\":\"4e6e73616d\",\"fullname\":\"basma 555 test\",\"account_number\":\"2588774555\",\"amount\":\"250\",\"workflow_state\":\"Pending\",\"status\":\"pending\",\"supported_bank\":\"da5694645f\"}",
-          "sid": "64fc4904519bfe16e91ca4c277fc54fc4de1a4006847176fa76aee13"
+          "data": "{\"bank\":\"${selectedUserBankModel.name}\",\"fullname\":\"$fullName_\",\"account_number\":\"$cardNumber_\",\"amount\":\"$amount_\",\"workflow_state\":\"Pending\",\"status\":\"pending\",\"supported_bank\":\"${selectedRassedBankModel.name}\"}",
+          "sid":sid
         }
+//
+//        {
+//          "data": "{\"bank\":\"4e6e73616d\",\"fullname\":\"basma 555 test\",\"account_number\":\"2588774555\",\"amount\":\"250\",\"workflow_state\":\"Pending\",\"status\":\"pending\",\"supported_bank\":\"da5694645f\"}",
+//          "sid":sid
+//        }
 
     )));
     HttpClientResponse response = await request.close();
 
-    print("\n\n status code is: ${response.statusCode}\n\n");
+    print("\n\n data mjghgfhjk: ${"{\"bank\":\"${selectedUserBankModel.name}\",\"fullname\":\"$fullName_\",\"account_number\":\"$cardNumber_\",\"amount\":\"$amount_\",\"workflow_state\":\"Pending\",\"status\":\"pending\",\"supported_bank\":\"${selectedRassedBankModel.name}\"}"}\n\n");
 
     // todo - you should check the response.statusCode
     String replay = await response.transform(utf8.decoder).join();
 
     print("\n\n status code is: ${response.statusCode}\n\n");
     print("\n\n bank_transfer replay is: $replay\n\n");
+
+    if (response.statusCode == 200) {
+      Loader.hideDialog(context);
+      print('\n\n getRasseedBank body is: ${json.decode(replay)}\n\n');
+      print('\n\n getRasseedBank json.decode(replay)[message] is: ${json.decode(replay)['message']}\n\n');
+      print('\n\n getRasseedBank rassedBankModel.bankName: ${userBankModelList[0].bankName}\n\n');
+
+      bankTransferScreenKey.currentState
+          .showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(
+            'تمت عمليه التحويل بنجاح',
+            textAlign: TextAlign.center,
+          )));
+
+      Future.delayed(Duration(seconds: 1), (){
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (BuildContext context) => Home_screen()), (Route<dynamic> route) => false);
+      });
+    } else {
+      Loader.hideDialog(context);
+    }
 
   }
 
@@ -312,6 +337,7 @@ https://app.rasseed.com/api/method/ash7anly.api.get_bank?_lang=ar&sid=64fc490451
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Color.fromRGBO(69, 57, 137, 1.0));
     return Scaffold(
+      key: bankTransferScreenKey,
       appBar: AppBar(
         elevation: 0.0,
         backgroundColor: Color.fromRGBO(69, 57, 137, 1.0),
