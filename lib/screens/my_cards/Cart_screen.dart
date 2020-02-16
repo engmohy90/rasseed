@@ -4,11 +4,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:rasseed/functions/shared_services.dart';
+import 'package:rasseed/screens/UI/AccountStatment.dart';
 import 'package:rasseed/screens/my_cards/GET_CURRENT_URL.dart';
 import 'package:rasseed/screens/my_cards/my_cards.dart';
 import 'package:rasseed/screens/payment/PaymentMethod.dart';
 import 'package:rasseed/utils/loader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flushbar/flushbar.dart';
+
 
 class Cart_screen extends StatefulWidget {
   @override
@@ -29,6 +32,91 @@ class _Cart_screenState extends State<Cart_screen> {
   GlobalKey<ScaffoldState> cartScreenKey = GlobalKey();
 
   String currentBalance = '0';
+
+  showNoBalanceDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        elevation: 4.0,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))),
+        content: Container(
+          height: MediaQuery.of(context).size.height / 4.5,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(top: 15.0),
+                child: Text(
+                  "ليس لديك رصيد كافي لشراء كرت جديد",
+                  style: TextStyle(color: Colors.black, fontSize: 15),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 15.0),
+                child: Text(
+                  "هل تريد الشحن؟",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.black, fontSize: 15),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 15),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(right: 40.0),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> AccountStatement('0.0')));
+                        },
+                        child: Text(
+                          "إيداع رصيد",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Color.fromRGBO(69, 57, 137, 1.0),
+                              fontWeight: FontWeight.w300),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          "اغلاق",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w300),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+
+    void flusher_error(String title, String message) {
+        Flushbar(
+              backgroundColor: Colors.red,
+              title: title,
+              message: message,
+              duration: Duration(milliseconds: 1500),
+        )..show(context);
+      }
 
   Future<String> getCurrentBalance(String sid) async {
     Loader.showUnDismissibleLoader(context);
@@ -233,13 +321,14 @@ class _Cart_screenState extends State<Cart_screen> {
                                           'يجب اخيار طريقه الدفع اولا',
                                           textAlign: TextAlign.center,
                                         ))))
-                            : cartScreenKey.currentState
-                            .showSnackBar(SnackBar(
-                            backgroundColor: Colors.red,
-                            content: Text(
-                              'ليس لديك رصيد كافي!',
-                              textAlign: TextAlign.center,
-                            )));
+                            :showNoBalanceDialog();
+//                            cartScreenKey.currentState
+//                            .showSnackBar(SnackBar(
+//                            backgroundColor: Colors.red,
+//                            content: Text(
+//                              'ليس لديك رصيد كافي!',
+//                              textAlign: TextAlign.center,
+//                            )));
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -470,7 +559,8 @@ class _Cart_screenState extends State<Cart_screen> {
                                                             if (json.decode(userCardsList[
                                                                         index])[
                                                                     'apiObjectCount'] >
-                                                                0) {
+                                                                0  && json.decode(userCardsList[index])['apiObjectCount'] <
+                                                                json.decode(json.decode(userCardsList[index])['apiObject'])['max_no_cards'] ) {
                                                               setState(() {
                                                                 num = json.decode(
                                                                     json.decode(
@@ -499,6 +589,11 @@ class _Cart_screenState extends State<Cart_screen> {
                                                                               })
                                                                             : null);
                                                               });
+                                                            }else{
+
+                                                                  print("FFFFFFFFFFFFFF  أقصي عدد شراء في المره الواحدة ${json.decode(userCardsList[
+                                                                  index])['max_no_cards']}");
+                                                                  flusher_error("",  " أقصي عدد شراء في المره الواحدة ${json.decode(json.decode(userCardsList[index])['apiObject'])['max_no_cards']}") ;
                                                             }
                                                           },
                                                           child: Container(

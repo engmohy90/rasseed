@@ -6,6 +6,7 @@ import 'package:flip_card/flip_card.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:persian_numbers/persian_numbers.dart';
 import 'package:rasseed/screens/login_screens/verfiy_login.dart';
 import 'package:rasseed/utils/loader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -115,6 +116,11 @@ class _FlipPageState extends State<FlipPage> {
   Future<String> login_screen() async {
     RegExp exp = new RegExp(r"(^[5]\d{8})");
     String str = phone_controoler.text;
+    str = str.replaceAll("١","1").replaceAll("٢","2").replaceAll("٣","3").replaceAll("٤","4").replaceAll("٥","5").replaceAll("٦","6").replaceAll("٧","7").replaceAll("٨","8").replaceAll("٩","9").replaceAll("٠","0");
+
+    print("ttttttttttttttttt${str}");
+
+
     bool phone_exp = exp.hasMatch(str);
 
     if (phone_exp == false) {
@@ -140,7 +146,7 @@ class _FlipPageState extends State<FlipPage> {
           Uri.parse("https://www.rasseed.com/api/method/ash7anly.auth1.login"));
       request.headers.set('content-type', 'application/json');
       request.add(utf8.encode(
-          json.encode({"phone": phone_controoler.text, "msg_via": msg_via})));
+          json.encode({"phone": str, "msg_via": msg_via})));
       HttpClientResponse response = await request.close();
 
       print("\n\n${response.statusCode}dssaaadxxsd\n\n");
@@ -220,11 +226,11 @@ class _FlipPageState extends State<FlipPage> {
       request.headers.set('content-type', 'application/json');
       request.add(utf8.encode(json.encode({
         "phone": phone_controoler2.text,
-        "full_name": first_name_controoler.text + last_name__controoler.text,
+        "full_name": first_name_controoler.text +" "+ last_name__controoler.text,
         "email": email_controoler.text,
         "work_as": work_as,
         "language": "ar",
-        "msg_via": "whatsapp"
+        "msg_via": "sms"
       })));
       HttpClientResponse response = await request.close();
       // todo - you should check the response.statusCode
@@ -567,6 +573,7 @@ class _FlipPageState extends State<FlipPage> {
                                   ),
                                   FlatButton(
                                       onPressed: () {
+
                                         set_auth("123");
                                       },
                                       child: Text(
@@ -1013,7 +1020,7 @@ class _FlipPageState extends State<FlipPage> {
                                                                     top: 0),
                                                             child: TextField(
                                                               controller:
-                                                                  phone_controoler,
+                                                                  phone_controoler2,
                                                               autofocus: false,
                                                               textAlign:
                                                                   TextAlign
