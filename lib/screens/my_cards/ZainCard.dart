@@ -220,6 +220,8 @@ class _ZienCardState extends State<ZienCard> {
                   ),
                 ),
                 operator != null
+                    ?
+                operator.length > 0
                     ? Container(
                         margin: EdgeInsets.only(top: 40.0),
                         child: Column(
@@ -866,12 +868,15 @@ class _ZienCardState extends State<ZienCard> {
                           ],
                         ),
                       )
+                    : Container()
                     : Container(
                         margin: EdgeInsets.only(top: 40.0),
                         height: (MediaQuery.of(context).size.height / 100) * 60,
                         alignment: Alignment.center,
                         child: CircularProgressIndicator()),
                 operator != null
+                    ?
+                operator.length > 0
                     ? Container(
                         margin: EdgeInsets.only(left: 40, top: 30.0, right: 40),
                         width: MediaQuery.of(context).size.width,
@@ -886,6 +891,11 @@ class _ZienCardState extends State<ZienCard> {
                               fontSize: 24.0),
                         ),
                       )
+                    : Container(
+                    margin: EdgeInsets.only(top: 40.0),
+                    height: (MediaQuery.of(context).size.height / 100) * 60,
+                    alignment: Alignment.center,
+                    child: Text('لا يوجد بيانات لعرضها'))
                     : Container(),
                 Container(
                   margin: EdgeInsets.only(
