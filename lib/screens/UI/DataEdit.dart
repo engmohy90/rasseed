@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:rasseed/screens/Home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flushbar/flushbar.dart';
 
 class DataEdit extends StatefulWidget {
   @override
@@ -42,22 +43,31 @@ class _DataEditState extends State<DataEdit> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(key, value);
   }
+   void flusher_error(String message) {
+       Flushbar(
+             backgroundColor: Colors.red,
+              title: "فشل التحديث ",
+              message: message,
+              duration: Duration(milliseconds: 1500),
+        )..show(context);
+      }
+
 
   @override
   void initState() {
     super.initState();
     getClientName().then((savedClientName) => setState(() =>
-        savedClientName != null
-            ? _name.text = savedClientName
-            : _name.text = ''));
+    savedClientName != null
+        ? _name.text = savedClientName
+        : _name.text = ''));
     getClientEmail().then((savedClientEmail) => setState(() =>
-        savedClientEmail != null
-            ? _email.text = savedClientEmail
-            : _email.text = ''));
+    savedClientEmail != null
+        ? _email.text = savedClientEmail
+        : _email.text = ''));
     getClientPhone().then((savedClientPhone) => setState(() =>
-        savedClientPhone != null
-            ? _phone.text = savedClientPhone
-            : _phone.text = '5xxxxxxxx'));
+    savedClientPhone != null
+        ? _phone.text = savedClientPhone
+        : _phone.text = '5xxxxxxxx'));
   }
 
   Future<String> edit_profile(String savedSID) async {
@@ -66,14 +76,23 @@ class _DataEditState extends State<DataEdit> {
       loading = true;
     });
 
+    String name_test = _name.text;
+        if(RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%-]').hasMatch(name_test)){
+          print("ERROR");
+          flusher_error("برجاء كتابه الاسم بشكل صحيح بدون رموز");
+          setState(() {
+            loading = false;
+          });
+        }else{
+
     HttpClient httpClient = new HttpClient();
     HttpClientRequest request = await httpClient.postUrl(Uri.parse(
-        "https://app.rasseed.com/api/method/ash7anly.mobile_api.edit_profile?"));
+    "https://app.rasseed.com/api/method/ash7anly.mobile_api.edit_profile?"));
     request.headers.set('content-type', 'application/json');
     request.add(utf8.encode(json.encode({
-      "sid": savedSID,
-      "data":
-          "{\"email\": \"${_email.text}\", \"full_name\": \"${_name.text}\"}"
+    "sid": savedSID,
+    "data":
+    "{\"email\": \"${_email.text}\", \"full_name\": \"${_name.text}\"}"
     })));
     HttpClientResponse response = await request.close();
     // todo - you should check the response.statusCode
@@ -86,26 +105,27 @@ class _DataEditState extends State<DataEdit> {
     print("ggggg${response.statusCode}");
     if (response.statusCode == 200) {
 
-      addValueToShared(
-        key: 'full_name',
-        value: _name.text,
-      );
-      addValueToShared(
-        key: 'email',
-        value: _email.text,
-      );
-      setState(() {
-        loading = false;
-      });
-      _showDialog(" تم التحديث بنجاح");
+    addValueToShared(
+    key: 'full_name',
+    value: _name.text,
+    );
+    addValueToShared(
+    key: 'email',
+    value: _email.text,
+    );
+    setState(() {
+    loading = false;
+    });
+    _showDialog(" تم التحديث بنجاح");
     } else {
-      setState(() {
-        loading = false;
-      });
-      _showDialog(" تم التحديث بنجاح");
+    setState(() {
+    loading = false;
+    });
+    _showDialog(" تم التحديث بنجاح");
     }
 
     return "done";
+    }
   }
 
   void _showDialog(String message) {
@@ -242,15 +262,15 @@ class _DataEditState extends State<DataEdit> {
               ),Container(
                 margin: EdgeInsets.only(
                   left: MediaQuery.of(context).size.width / 4,
-                    top: 40.0,
-                    right: MediaQuery.of(context).size.width / 4,
-                    bottom: MediaQuery.of(context).size.width / 4,
+                  top: 40.0,
+                  right: MediaQuery.of(context).size.width / 4,
+                  bottom: MediaQuery.of(context).size.width / 4,
                 ),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
                     border:
-                        Border.all(color: Color.fromRGBO(69, 57, 137, 1.0))),
+                    Border.all(color: Color.fromRGBO(69, 57, 137, 1.0))),
                 child:
                 loading
                     ? Center(child: new CircularProgressIndicator())
@@ -260,20 +280,20 @@ class _DataEditState extends State<DataEdit> {
                   onTap: () {
                     _name.text != null && _name.text.length > 0
                         ? _email.text != null && _email.text.length > 0
-                            ? getUserSID()
-                                .then((savedSID) => edit_profile(savedSID))
-                            : dataEditScaffoldKey.currentState.showSnackBar(
-                                SnackBar(content: Text('يجب ادخال ايميلك!!')))
+                        ? getUserSID()
+                        .then((savedSID) => edit_profile(savedSID))
                         : dataEditScaffoldKey.currentState.showSnackBar(
-                            SnackBar(content: Text('يجب ادخال الاسم!!')));
+                        SnackBar(content: Text('يجب ادخال ايميلك!!')))
+                        : dataEditScaffoldKey.currentState.showSnackBar(
+                        SnackBar(content: Text('يجب ادخال الاسم!!')));
                   },
                   child: Text(
-                          "تحديث",
-                          style: TextStyle(
-                              color: Color.fromRGBO(69, 57, 137, 1.0),
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400),
-                        ),
+                    "تحديث",
+                    style: TextStyle(
+                        color: Color.fromRGBO(69, 57, 137, 1.0),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400),
+                  ),
                 ),
               )
             ],

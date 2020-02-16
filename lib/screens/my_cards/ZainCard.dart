@@ -8,6 +8,7 @@ import 'package:rasseed/screens/login_screens/Login_with_flip.dart';
 import 'package:rasseed/utils/bottom_sheet_customize.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_animations/simple_animations/controlled_animation.dart';
+import 'package:flushbar/flushbar.dart';
 
 class ZienCard extends StatefulWidget {
   final String operatorID;
@@ -40,6 +41,14 @@ class _ZienCardState extends State<ZienCard> {
   Color cardAmountColor = Colors.white;
   Color selectedCardColor = Colors.white;
   Color cardsListColor = Colors.white;
+    void flusher_error(String title, String message) {
+        Flushbar(
+              backgroundColor: Colors.red,
+              title: title,
+              message: message,
+              duration: Duration(milliseconds: 1500),
+        )..show(context);
+      }
 
   loginAlert() {
     showDialog(
@@ -488,11 +497,19 @@ class _ZienCardState extends State<ZienCard> {
                                     InkWell(
                                       highlightColor: Colors.white,
                                       splashColor: Colors.white,
-                                      onTap: () => setState(() {
-                                        cardAmountColor = Colors.white;
+                                      onTap: () {
+                                        if (cardAmount < selectedCard['max_no_cards']){
+                                          setState(() {
+                                            cardAmountColor = Colors.white;
+                                            cardAmount++;
+                                          });}
+                                        else{
 
-                                        cardAmount++;
-                                      }),
+                                          flusher_error("",  " أقصي عدد شراء في المره الواحدة ${selectedCard['max_no_cards']}") ;
+
+                                        }
+
+                                      },
                                       child: Container(
                                         alignment: Alignment.center,
                                         width: 30.0,

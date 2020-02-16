@@ -403,7 +403,7 @@ class _Home_screenState extends State<Home_screen> {
                                     color: Colors.white, fontSize: 16),
                               ),
                               alignment: Alignment.centerRight),
-                          client_full_name != null
+                          client_full_name != null && client_auth != "123"
                               ? Container(
                                   alignment: Alignment.centerRight,
                                   child: Text(
