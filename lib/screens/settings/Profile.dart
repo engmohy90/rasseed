@@ -87,7 +87,7 @@ class _ProfileState extends State<Profile> {
                           "خروج",
                           style: TextStyle(
                               fontSize: 16,
-                              color: Colors.red,
+                              color: Color.fromRGBO(69, 57, 137, 1.0),
                               fontWeight: FontWeight.normal),
                         ),
                       ),
@@ -101,7 +101,7 @@ class _ProfileState extends State<Profile> {
                           "إلغاء",
                           style: TextStyle(
                               fontSize: 16,
-                              color: Color.fromRGBO(69, 57, 137, 1.0),
+                              color: Colors.red,
                               fontWeight: FontWeight.w300),
                         ),
                       ),

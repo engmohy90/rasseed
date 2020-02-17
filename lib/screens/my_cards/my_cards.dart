@@ -23,10 +23,10 @@ class _My_cardsState extends State<My_cards> {
             bottom: TabBar(
               tabs: [
                 Tab(
-                  child: Text("بطاقات مستخدمة"),
+                  child: Text("بطاقات جديدة"),
                 ),
                 Tab(
-                  child: Text("بطاقات جديدة"),
+                  child: Text("بطاقات مستخدمة"),
                 ),
               ],
             ),
@@ -46,8 +46,8 @@ class _My_cardsState extends State<My_cards> {
           ),
           body: TabBarView(
             children: [
-              pervious_cards(),
               new_cards(),
+              pervious_cards(),
             ],
           ),
         ),

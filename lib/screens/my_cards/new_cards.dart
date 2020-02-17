@@ -233,7 +233,7 @@ class _new_cardsState extends State<new_cards> {
 
       if(double.parse(savedBalance) == 0.0){
         setState(() {cardsDataList = List();
-        showNoBalanceDialog();
+//        showNoBalanceDialog();
         });
       }else
 
