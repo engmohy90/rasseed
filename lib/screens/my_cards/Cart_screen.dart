@@ -395,13 +395,15 @@ class _Cart_screenState extends State<Cart_screen> {
                             double.parse(currentBalance) >= totalPrice ?
                             getUserSID().then((savedSID) {
                               buyFromMyAccount(savedSID);
-                            }): cartScreenKey.currentState
-                                .showSnackBar(SnackBar(
-                                backgroundColor: Colors.red,
-                                content: Text(
-                                  'ليس لديك رصيد كافي!',
-                                  textAlign: TextAlign.center,
-                                )));
+                            }):
+                            showNoBalanceDialog();
+//                            cartScreenKey.currentState
+//                                .showSnackBar(SnackBar(
+//                                backgroundColor: Colors.red,
+//                                content: Text(
+//                                  'ليس لديك رصيد كافي!',
+//                                  textAlign: TextAlign.center,
+//                                )));
                           }
 
                           else if(paymentName == 'ابل باى'){
